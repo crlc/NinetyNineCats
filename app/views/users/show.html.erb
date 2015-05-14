@@ -1,0 +1,23 @@
+<H2>These are your sessions.</H2>
+
+<table>
+  <tr>
+    <th>Session</th>
+    <th>When Opened</th>
+    <th>Log Out</th>
+    <th>Device Info</th>
+    <th>Request Address</th>
+  </tr>
+
+  <% @user.sessions.each do |session| %>
+    <tr>
+      <td><%= session.session_token[-6..-1] %></td>
+      <td><%= time_ago_in_words(session.created_at) %></td>
+      <td><%= button_to "Log session out",
+                          session_url(session), method: :delete %></td>
+      <td><%= session.platform %> | <%= session.browser %></td>
+      <td><%= session.address %></td>
+    </tr>
+  <% end %>
+
+</table>

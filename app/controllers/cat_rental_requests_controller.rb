@@ -1,4 +1,6 @@
 class CatRentalRequestsController < ApplicationController
+  before_action :validate_user, only: [:approve, :deny]
+
   def approve
     current_cat_rental_request.approve!
     redirect_to cat_url(current_cat)
@@ -6,6 +8,7 @@ class CatRentalRequestsController < ApplicationController
 
   def create
     @rental_request = CatRentalRequest.new(cat_rental_request_params)
+    @rental_request.user_id = current_user.id
     if @rental_request.save
       redirect_to cat_url(@rental_request.cat)
     else
@@ -21,6 +24,16 @@ class CatRentalRequestsController < ApplicationController
 
   def new
     @rental_request = CatRentalRequest.new
+    if params[:cat_request_id]
+      @rental_request.cat_id = params[:cat_request_id]
+    end
+  end
+
+  def validate_user
+    if current_cat.user_id != current_user.id
+      flash[:warning] = "Can't approve or deny this request."
+      redirect_to cats_url(current_cat)
+    end
   end
 
   private

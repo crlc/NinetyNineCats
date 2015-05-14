@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141030172156) do
+ActiveRecord::Schema.define(version: 20150514003431) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20141030172156) do
     t.string   "status",     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "user_id",    null: false
   end
 
   add_index "cat_rental_requests", ["cat_id"], name: "index_cat_rental_requests_on_cat_id", using: :btree
@@ -35,6 +36,32 @@ ActiveRecord::Schema.define(version: 20141030172156) do
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "user_id"
   end
+
+  add_index "cats", ["user_id"], name: "index_cats_on_user_id", using: :btree
+
+  create_table "sessions", force: true do |t|
+    t.string   "session_token",   null: false
+    t.integer  "user_id",         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "http_user_agent"
+    t.string   "remote_ip"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.string   "address"
+  end
+
+  add_index "sessions", ["session_token"], name: "index_sessions_on_session_token", unique: true, using: :btree
+
+  create_table "users", force: true do |t|
+    t.string   "username",        null: false
+    t.string   "password_digest", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["username"], name: "index_users_on_username", unique: true, using: :btree
 
 end

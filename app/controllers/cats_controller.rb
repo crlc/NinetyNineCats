@@ -1,4 +1,7 @@
 class CatsController < ApplicationController
+
+  before_action :validate_user, only: [:edit, :update]
+
   def index
     @cats = Cat.all
     render :index
@@ -6,6 +9,7 @@ class CatsController < ApplicationController
 
   def show
     @cat = Cat.find(params[:id])
+    @cat_rental_requests = @cat.rental_requests.includes(:user).order("start_date")
     render :show
   end
 
@@ -16,6 +20,7 @@ class CatsController < ApplicationController
 
   def create
     @cat = Cat.new(cat_params)
+    @cat.user_id = current_user.id
     if @cat.save
       redirect_to cat_url(@cat)
     else
@@ -39,6 +44,13 @@ class CatsController < ApplicationController
     end
   end
 
+  def validate_user
+    @cat = Cat.find(params[:id])
+    if current_user.id != @cat.user_id
+      flash[:warning] = "Stop that! You do not own this cat."
+      redirect_to cats_url
+    end
+  end
   private
 
   def cat_params
